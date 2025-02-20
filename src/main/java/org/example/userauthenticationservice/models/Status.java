@@ -1,4 +1,5 @@
 package org.example.userauthenticationservice.models;
 
-public enum State {
+public enum Status {
+    ACTIVE,INACTIVE
 }

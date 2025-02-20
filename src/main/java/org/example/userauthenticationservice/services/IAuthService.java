@@ -1,13 +1,16 @@
 package org.example.userauthenticationservice.services;
 
+import org.example.userauthenticationservice.exceptions.UserEmailAlreadyExistsException;
+import org.example.userauthenticationservice.exceptions.UserNotFoundException;
+import org.example.userauthenticationservice.exceptions.UserPasswordMisMatchException;
 import org.example.userauthenticationservice.models.User;
 
-public interface IUserService {
+public interface IAuthService {
 
 
-    public User findUserByEmail(String email);
+    public User signUp(String email,String password) throws UserEmailAlreadyExistsException;
 
-    public User saveUser(User user);
+    public User login(String  email, String password) throws UserNotFoundException, UserPasswordMisMatchException;
 
 
 }
