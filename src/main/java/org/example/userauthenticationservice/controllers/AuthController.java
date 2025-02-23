@@ -4,6 +4,8 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.example.userauthenticationservice.dtos.LoginRequestDto;
 import org.example.userauthenticationservice.dtos.SignUpRequest;
 import org.example.userauthenticationservice.dtos.UserDto;
+import org.example.userauthenticationservice.dtos.ValidateTokenDto;
+import org.example.userauthenticationservice.exceptions.UnAuthorizedException;
 import org.example.userauthenticationservice.exceptions.UserEmailAlreadyExistsException;
 import org.example.userauthenticationservice.exceptions.UserNotFoundException;
 import org.example.userauthenticationservice.exceptions.UserPasswordMisMatchException;
@@ -15,10 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -58,6 +57,18 @@ public class AuthController {
       {
           return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
       }
+    }
+
+
+    @GetMapping("/validateToken")
+    public boolean validateToken(@RequestBody ValidateTokenDto validateTokenDto) throws UnAuthorizedException {
+       boolean result= authService.validateToken(validateTokenDto.getToken(), validateTokenDto.getUserId());
+
+       if(result==false)
+       {
+           throw new UnAuthorizedException("please Login again");
+       }
+return result;
     }
 
 

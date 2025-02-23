@@ -1,7 +1,9 @@
 package org.example.userauthenticationservice.services;
 
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import org.antlr.v4.runtime.misc.Pair;
 import org.example.userauthenticationservice.exceptions.UserEmailAlreadyExistsException;
@@ -111,6 +113,30 @@ public class AuthService implements IAuthService {
 
         return pair;
 
+    }
+
+
+    public boolean validateToken(String token, Long userId) {
+        Optional<Session> sessionOptional=sessionRepo.findByTokenAndUser_Id(token, userId);
+        if(sessionOptional.isEmpty()){
+            return false;
+        }
+        Session session=sessionOptional.get();
+        String encodedToken= session.getToken();
+
+        JwtParser jwtParser=Jwts.parser().verifyWith(secretKey).build();
+        Claims claims= jwtParser.parseClaimsJws(encodedToken).getBody();
+
+        Long tokenExpiry=claims.get("exp",Long.class);
+
+        Long currentTimeInMillies= System.currentTimeMillis();
+
+        if(currentTimeInMillies>tokenExpiry){
+            session.setStatus(Status.INACTIVE);
+            sessionRepo.save(session);
+            return false;
+        }
+        return true;
     }
 
 
